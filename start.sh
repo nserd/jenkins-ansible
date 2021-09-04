@@ -9,8 +9,8 @@ function usage {
 
 function arg-handler {
     [ -z "$1" ] && echo "No agruments found. Use --help" && exit 1
-    [ -z "$2" ] && echo "No IP found. Use --help" && exit 1
     [ "$1" == "--help" ] && usage && exit 0
+    [ -z "$2" ] && echo "No IP found. Use --help" && exit 1
 
     domain="$1"
     ip="$2"
