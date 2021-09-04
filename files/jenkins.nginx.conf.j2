@@ -1,0 +1,10 @@
+server {
+	listen 80 default_server;
+	listen [::]:80 default_server;
+
+	server_name {{domain}} www.{{domain}};
+
+	location / {
+        	proxy_pass http://localhost:8080;
+	}
+}

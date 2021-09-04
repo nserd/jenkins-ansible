@@ -1,0 +1,60 @@
+# Jenkins
+---
+- hosts: jenkins
+  user: root
+
+  tasks:
+    - name: Add repository key
+      apt_key:
+        url: https://pkg.jenkins.io/debian-stable/jenkins.io.key
+        state: present
+
+    - name: Add repository entry
+      copy: 
+        src: files/jenkins.list
+        dest: /etc/apt/sources.list.d/jenkins.list
+
+    - name: Apt update and upgrade
+      apt: update_cache=yes upgrade=yes
+
+    - name: Install packages
+      apt:
+        name: "{{item}}"
+        state: latest
+      loop:
+        - openjdk-11-jdk
+        - jenkins
+        - nginx
+        - python3-certbot-nginx
+
+    - name: Setup Jenkins
+      copy: 
+        src: files/jenkins.default
+        dest: /etc/default/jenkins
+
+    - name: Remove default Nginx config
+      file:
+        path: "{{item}}"
+        state: absent
+      loop: 
+        - /etc/nginx/sites-enabled/default
+        - /etc/nginx/sites-available/default
+
+    - name: Add Nginx configuration file (Jenkins proxy)
+      template:
+        src: files/jenkins.nginx.conf.j2
+        dest: /etc/nginx/sites-available/jenkins
+
+    - name: Enable Nginx configuration (Jenkins proxy)
+      file:
+        src: /etc/nginx/sites-available/jenkins
+        dest: /etc/nginx/sites-enabled/jenkins
+        state: link
+
+    - name: Add Jenkins configuration
+      copy:
+        src: files/jenkins.default
+        dest: /etc/default/jenkins
+
+    - name: Install certificate on {{domain}}
+      shell: /usr/bin/certbot -n --agree-tos -m admin@example.com --nginx -d {{domain}} -d www.{{domain}}
