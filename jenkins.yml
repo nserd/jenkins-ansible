@@ -57,4 +57,4 @@
         dest: /etc/default/jenkins
 
     - name: Install certificate on {{domain}}
-      shell: /usr/bin/certbot -n --agree-tos -m admin@example.com --nginx -d {{domain}} -d www.{{domain}}
+      shell: /usr/bin/certbot -n --agree-tos -m admin@{{domain}} --nginx -d {{domain}} -d www.{{domain}}
